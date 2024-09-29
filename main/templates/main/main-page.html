@@ -156,7 +156,7 @@
                     <h3>{{ video.title }}</h3>
                     <div class="category">Категория: {{ video.category_id }}</div>
                     <p>{{ video.description }}</p>
-                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
+                    <div class="date">Дата публикации: {{ video.v_pub_datetime|default:"Не указана" }}</div>
                     <div class="hash-id" onclick="copyToClipboard('{{ video.video_id|default:"Не указан" }}')">
                         ID: {{ video.video_id|default:"Не указан" }}</div>
                     <div class="reaction-buttons">
@@ -176,22 +176,22 @@
         <h2><i class="ri-fire-fill"></i> В тренде</h2>
         <div class="shelf" id="trending-shelf">
             {% for video in trending_videos %}
-                <div class="video-card">
-                    <h3>{{ video.title }}</h3>
-                    <div class="category">Категория: {{ video.category }}</div>
-                    <p>{{ video.description }}</p>
-                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
-                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
-                        ID: {{ video.id|default:"Не указан" }}</div>
-                    <div class="reaction-buttons">
-                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
-                            Нравится
-                        </button>
-                        <button class="reaction-button dislike-button"
-                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
-                        </button>
-                    </div>
+            <div class="video-card">
+                <h3>{{ video.title }}</h3>
+                <div class="category">Категория: {{ video.category_id }}</div>
+                <p>{{ video.description }}</p>
+                <div class="date">Дата публикации: {{ video.v_pub_datetime|default:"Не указана" }}</div>
+                <div class="hash-id" onclick="copyToClipboard('{{ video.video_id|default:"Не указан" }}')">
+                    ID: {{ video.video_id|default:"Не указан" }}</div>
+                <div class="reaction-buttons">
+                    <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.video_id }}')">
+                        Нравится
+                    </button>
+                    <button class="reaction-button dislike-button"
+                            onclick="sendReaction('dislike', '{{ video.video_id }}')">Не нравится
+                    </button>
                 </div>
+            </div>
             {% endfor %}
         </div>
         <div class="shelf-dots" id="trending-dots"></div>
@@ -200,22 +200,22 @@
         <h2><i class="ri-question-mark"></i> Новые видео</h2>
         <div class="shelf" id="new-shelf">
             {% for video in new_videos %}
-                <div class="video-card">
-                    <h3>{{ video.title }}</h3>
-                    <div class="category">Категория: {{ video.category }}</div>
-                    <p>{{ video.description }}</p>
-                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
-                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
-                        ID: {{ video.id|default:"Не указан" }}</div>
-                    <div class="reaction-buttons">
-                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
-                            Нравится
-                        </button>
-                        <button class="reaction-button dislike-button"
-                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
-                        </button>
-                    </div>
+            <div class="video-card">
+                <h3>{{ video.title }}</h3>
+                <div class="category">Категория: {{ video.category_id }}</div>
+                <p>{{ video.description }}</p>
+                <div class="date">Дата публикации: {{ video.v_pub_datetime|default:"Не указана" }}</div>
+                <div class="hash-id" onclick="copyToClipboard('{{ video.video_id|default:"Не указан" }}')">
+                    ID: {{ video.video_id|default:"Не указан" }}</div>
+                <div class="reaction-buttons">
+                    <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.video_id }}')">
+                        Нравится
+                    </button>
+                    <button class="reaction-button dislike-button"
+                            onclick="sendReaction('dislike', '{{ video.video_id }}')">Не нравится
+                    </button>
                 </div>
+            </div>
             {% endfor %}
         </div>
         <div class="shelf-dots" id="new-dots"></div>

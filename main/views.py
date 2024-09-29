@@ -16,7 +16,7 @@ import urllib.parse
 def index(request):
     # Проверка аутентификации пользователя
     if not request.user.is_authenticated:
-        return redirect('login')
+        return redirect('register')
     
     # Получение данных о реакциях пользователя
     liked_videos = Reaction.objects.filter(user=request.user, reaction_type='like').values_list('video_id', flat=True)
@@ -45,7 +45,7 @@ def index(request):
     req = urllib.request.Request(ai_url, data=encoded_payload, headers=headers)
     with urllib.request.urlopen(req) as response:
         response_data = json.loads(response.read().decode('utf-8'))
-
+        print(response_data)
         # Проверка формата ответа
         if isinstance(response_data, str):
             response_data = json.loads(response_data)
@@ -55,8 +55,28 @@ def index(request):
 
         print(recommended_videos)
 
+        # Добавляем трендовые и новые видео
+        import csv
+        import random
+        import os
+
+        def get_random_videos(csv_file, count=5):
+            with open(os.path.join(settings.BASE_DIR, 'main', 'static', 'main', 'csv', csv_file), 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                videos = list(reader)
+                return random.sample(videos, min(count, len(videos)))
+
+        trending_videos = get_random_videos('trending_videos.csv', 5)
+        new_videos = get_random_videos('new_videos.csv', 5)
+
+        # Преобразуем данные в нужный формат
+        trending_videos = [{'video_id': video['video_id'], 'title': video['title'], 'description': video['description'], 'v_pub_datetime': video['v_pub_datetime'], 'category_id': video['category_id']} for video in trending_videos]
+        new_videos = [{'video_id': video['video_id'], 'title': video['title'], 'description': video['description'], 'v_pub_datetime': video['v_pub_datetime'], 'category_id': video['category_id']} for video in new_videos]
+        
         context = {
-            'recommended_videos': recommended_videos
+            'recommended_videos': recommended_videos,
+            'trending_videos': trending_videos,
+            'new_videos': new_videos
         }
     print(context)
 

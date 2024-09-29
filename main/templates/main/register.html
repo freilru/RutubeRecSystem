@@ -75,6 +75,7 @@
 
 {% block content %}
     <h2 style="color: #ffffff;" >Регистрация</h2>
+    <p style="color: #ffffff;">Пароль должен содержать минимум 8 символов, цифру, заглавную и строчную букву</p>
     <form method="post">
         {% csrf_token %}
         {% for field in form %}

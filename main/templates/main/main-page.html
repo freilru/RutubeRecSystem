@@ -1,0 +1,267 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block styles %}
+    <style>
+
+
+        main {
+            padding: 20px;
+        }
+
+        h2 {
+            color: #f0f0f0;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .shelf {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .shelf::-webkit-scrollbar {
+            display: none;
+        }
+
+        .video-card {
+            flex: 0 0 auto;
+            width: 300px;
+            margin-right: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            scroll-snap-align: start;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .video-card .category {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .video-card p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .video-card .date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .video-card .hash-id {
+            font-size: 12px;
+            color: #333;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .video-card .reaction-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .video-card .reaction-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .video-card .like-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .video-card .dislike-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .shelf-dots {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .shelf-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+
+        .shelf-dot.active {
+            background-color: #00A1E7;
+        }
+
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    
+        <h2><i class="ri-bard-fill"></i> Рекомендуемые</h2>
+        <div class="shelf" id="recommended-shelf">
+            {% for video in recommended_videos %}
+                <div class="video-card">
+                    <h3>{{ video.title }}</h3>
+                    <div class="category">Категория: {{ video.category }}</div>
+                    <p>{{ video.description }}</p>
+                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
+                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
+                        ID: {{ video.id|default:"Не указан" }}</div>
+                    <div class="reaction-buttons">
+                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
+                            Нравится
+                        </button>
+                        <button class="reaction-button dislike-button"
+                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="shelf-dots" id="recommended-dots"></div>
+
+        <h2><i class="ri-fire-fill"></i> В тренде</h2>
+        <div class="shelf" id="trending-shelf">
+            {% for video in trending_videos %}
+                <div class="video-card">
+                    <h3>{{ video.title }}</h3>
+                    <div class="category">Категория: {{ video.category }}</div>
+                    <p>{{ video.description }}</p>
+                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
+                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
+                        ID: {{ video.id|default:"Не указан" }}</div>
+                    <div class="reaction-buttons">
+                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
+                            Нравится
+                        </button>
+                        <button class="reaction-button dislike-button"
+                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="shelf-dots" id="trending-dots"></div>
+
+        <h2><i class="ri-question-mark"></i> Новые видео</h2>
+        <div class="shelf" id="new-shelf">
+            {% for video in new_videos %}
+                <div class="video-card">
+                    <h3>{{ video.title }}</h3>
+                    <div class="category">Категория: {{ video.category }}</div>
+                    <p>{{ video.description }}</p>
+                    <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
+                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
+                        ID: {{ video.id|default:"Не указан" }}</div>
+                    <div class="reaction-buttons">
+                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
+                            Нравится
+                        </button>
+                        <button class="reaction-button dislike-button"
+                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="shelf-dots" id="new-dots"></div>
+
+   
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function () {
+                alert('ID скопирован: ' + text);
+            }, function (err) {
+                console.error('Ошибка при копировании: ', err);
+            });
+        }
+
+        function sendReaction(reaction, videoId) {
+            fetch('{% url "send_reaction" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `video_id=${videoId}&reaction_type=${reaction}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Ваша реакция "' + reaction + '" для видео ' + videoId + ' отправлена');
+                } else {
+                    alert('Произошла ошибка при отправке реакции');
+                }
+            });
+        }
+
+        
+
+        function initDots(shelfId, dotsId) {
+            const shelf = document.getElementById(shelfId);
+            const dots = document.getElementById(dotsId);
+            const cards = shelf.querySelectorAll('.video-card');
+            const dotCount = cards.length;
+
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('shelf-dot');
+                if (i === 0) dot.classList.add('active');
+                dots.appendChild(dot);
+            }
+
+            shelf.addEventListener('scroll', () => {
+                const scrollPosition = shelf.scrollLeft;
+                const cardWidth = cards[0].offsetWidth + parseInt(window.getComputedStyle(cards[0]).marginRight);
+                const currentIndex = Math.round(scrollPosition / cardWidth);
+
+                dots.querySelectorAll('.shelf-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initDots('recommended-shelf', 'recommended-dots');
+            initDots('trending-shelf', 'trending-dots');
+            initDots('new-shelf', 'new-dots');
+        });
+    </script>
+{% endblock %}

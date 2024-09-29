@@ -1,0 +1,91 @@
+{% extends 'main/login-base.html' %}
+
+{% block additional_styles %}
+    <style>
+        h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            color: #ffffff;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3a4750;
+            border-radius: 5px;
+            background-color: #2c3540;
+            color: #ffffff;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3a4750;
+            border-radius: 5px;
+            background-color: #2c3540;
+            color: #ffffff;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 98%;
+            background-position-y: 50%;
+        }
+        .button {
+            background-color: #00A1E7;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background-color: #0081b8;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .login-button {
+            background-color: transparent;
+            border: 1px solid #00A1E7;
+        }
+        .login-button:hover {
+            background-color: rgba(0, 161, 231, 0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 style="color: #ffffff;" >Регистрация</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+        {% endfor %}
+        <div class="button-group">
+            <button type="submit" class="button">Зарегистрироваться</button>
+            <a href="{% url 'login' %}" class="button login-button">Войти</a>
+        </div>
+    </form>
+{% endblock %}

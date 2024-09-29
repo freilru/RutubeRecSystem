@@ -1,0 +1,145 @@
+{% extends 'main/base.html' %}
+
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .user-info, .user-actions {
+        margin-bottom: 30px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    
+    .logout-button {
+        text-align: center;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #fff;
+        background-color: #dc3545;
+        border-radius: 5px;
+    }
+    
+    .btn:hover {
+        background-color: #c82333;
+    }
+    h2{
+        color: white;
+    }
+    p{
+        color: white;
+    }
+    h1{
+        color: white;
+    }
+    td{
+        color: white;
+    }
+    </style>
+<div class="profile-container">
+    <h1 style="color: white;">Профиль пользователя</h1>
+    
+    <div class="user-info">
+        <h2 style="color: white;">Информация о пользователе</h2>
+        <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+        <p><strong>Возраст:</strong> {{ user.age|default:"Не указан" }}</p>
+        <p><strong>Пол:</strong> {{ user.get_gender_display|default:"Не указан" }}</p>
+    </div>
+
+    <div class="user-actions">
+        <h2>Реакции на видео</h2>
+        <table class="reactions-table">
+            <thead>
+                <tr>
+                    <th>ID видео</th>
+                    <th>Тип реакции</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reaction in reactions %}
+                <tr>
+                    <td>{{ reaction.video_id }}</td>
+                    <td>{{ reaction.reaction_type }}</td>
+                    <td>{{ reaction.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Нет реакций на видео</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Поисковые запросы</h2>
+        <table class="search-queries-table">
+            <thead>
+                <tr>
+                    <th>Запрос</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for query in search_queries %}
+                <tr>
+                    <td>{{ query.query }}</td>
+                    <td>{{ query.created_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">Нет поисковых запросов</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h2>Показанные видео</h2>
+        <table class="shown-videos-table">
+            <thead>
+                <tr>
+                    <th>ID видео</th>
+                    <th>Дата</th>
+                </tr> 
+            </thead>
+            <tbody>
+                {% for video in shown_videos %}
+                <tr>
+                    <td>{{ video.video_id }}</td>
+                    <td>{{ video.shown_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Нет показанных видео</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            
+
+    <div class="logout-button">
+        <a href="{% url 'logout' %}" class="btn btn-danger">Выйти из аккаунта</a>
+    </div>
+</div>
+{% endblock %}

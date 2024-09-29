@@ -1,0 +1,231 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>РУТУБ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #14191f;
+        }
+
+        header {
+            background-color: #1c232b;
+            padding: 10px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            margin: 0 0px;
+            position: relative;
+        }
+
+        .search-bar-inner {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 30px;
+            padding: 5px 15px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 10px;
+        }
+
+        .search-bar i {
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .search-bar .placeholder {
+            position: absolute;
+            left: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .search-bar input:focus + .placeholder,
+        .search-bar input:not(:placeholder-shown) + .placeholder {
+            opacity: 0;
+        }
+
+        .search-bar .submit-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #1c232b;
+            color: #ffffff;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            text-align: center;
+            width: 36px;
+            height: 36px;
+           
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-bar input:focus ~ .submit-btn,
+        .search-bar input:not(:placeholder-shown) ~ .submit-btn {
+            display: block;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-menu i {
+            color: #ffffff;
+            font-size: 20px;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+       
+
+        footer {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(28, 35, 43, 0.8);
+            height: var(--bottomMobileMenuHeight);
+            left: 0;
+            margin-bottom: 0;
+            padding: 0 10px;
+            position: fixed;
+            bottom: 0;
+            transition: all .25s;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        footer .footer-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+
+        footer .footer-item i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        footer .footer-item span {
+            font-size: 12px;
+        }
+
+    </style>
+    {% block styles %}
+    {% endblock %}
+</head>
+<body>
+<header>
+    <div class="logo">
+        <img src="{% static 'main/images/Logo_RUTUBE_white_color.png' %}" alt="РУТУБ" width="100">
+    </div>
+    <div class="search-bar">
+        <div class="search-bar-inner">
+            <i class="ri-compass-line"></i>
+            <input type="text" placeholder=" " id="search-input">
+            <span class="placeholder">Поиск видео</span>
+            <button class="submit-btn" onclick="sendSearch(document.getElementById('search-input').value)"><i class="ri-search-line ri-24px" style="color: white; margin: 0;"></i></button>
+        </div>
+    </div>
+    <div class="user-menu">
+        <i class="ri-notification-line" style="color: white;"></i>
+        <i class="ri-user-line" style="color: white;"></i>
+    </div>
+</header>
+</header>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer>
+    <a href="{% url 'index' %}" class="footer-item">
+        <i class="ri-home-smile-2-line"></i>
+        <span>Дом</span>
+    </a>
+    <a href="{% url 'shorts' %}" class="footer-item">
+        <i class="ri-video-line"></i>
+        <span>Шортс</span>
+    </a>
+    <a href="{% url 'profile' %}" class="footer-item">
+        <i class="ri-user-3-line"></i>
+        <span>Профиль</span>
+    </a>
+</footer>
+
+
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('ID скопирован: ' + text);
+    }, function(err) {
+        console.error('Ошибка при копировании: ', err);
+    });
+}
+
+
+function sendSearch(text) {
+            fetch("{% url 'send_search' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `query=${text}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Поисковый запрос "' + text + '" отправлен');
+                } else {
+                    alert('Произошла ошибка при отправке поискового запроса');
+                }
+            });
+        }
+
+</script>
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+</html>

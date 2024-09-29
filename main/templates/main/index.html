@@ -1,0 +1,408 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet">
+
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+<style>
+    /* Стили для абсолютного позиционирования анимации и текста */
+    body {
+        position: relative;
+        height: 100vh; /* Высота экрана */
+        margin: 0; /* Убираем отступы */
+        
+        color: white; /* Цвет текста */
+        text-align: center; /* Центрирование текста */
+        overflow: hidden; /* Скрыть переполнение */
+    }
+
+    .tutorial-div {
+        background-color: rgba(0, 0, 0, 0.3); /* Затемненный фон */
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .tutorial-anim-player {
+        position: absolute; /* Абсолютное позиционирование анимации */
+        top: 50%; /* Центрирование по вертикали */
+        left: 50%; /* Центрирование по горизонтали */
+        transform: translate(-50%, -50%); /* Сдвиг для центрирования */
+    }
+
+    #message {
+        position: absolute; /* Абсолютное позиционирование текста */
+        top: 70%; /* Позиция текста под анимацией */
+        left: 50%; /* Центрирование текста */
+        transform: translate(-50%, -50%); /* Сдвиг для центрирования */
+        font-family: 'Roboto', sans-serif; /* Применение шрифта Roboto */
+        font-size: 20px;
+    }
+
+    /* Стили для Tinder-подобного интерфейса */
+    *, *:before, *:after {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tinder {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        opacity: 0;
+        transition: opacity 0.1s ease-in-out;
+        justify-content: flex-start; /* Выравнивание сверху вниз */
+        align-items: center; /* Центрирование по горизонтали */
+    }
+
+    .loaded.tinder {
+        opacity: 1;
+    }
+
+    .tinder--status {
+        position: absolute;
+        top: 50%;
+        left: 50%; /* Центрирование по горизонтали */
+        transform: translate(-50%, -50%); /* Центрирование по вертикали */
+        z-index: 2;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .tinder--status i {
+        font-size: 100px;
+        opacity: 0;
+        transform: scale(0.3);
+        transition: all 0.2s ease-in-out;
+        position: absolute;
+        width: 100px;
+        margin-left: -50px;
+    }
+
+    .tinder_love .fa-heart {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+
+    .tinder_nope .fa-remove {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+
+    .tinder--cards {
+        flex-grow: 1;
+        padding-top: 0px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Центрирование карточек по вертикали */
+        z-index: 1;
+        top: 0;
+        
+    }
+
+    .tinder--card {
+        display: inline-block;
+        width: 96vw; /* Изменено для соотношения 9:16 */
+        height: calc(96vw * 1920 / 1080); /* Изменено для соотношения 1080:1920 */
+        background: #FFFFFF;
+        border-radius: 20px;
+        overflow: hidden;
+        position: absolute;
+        will-change: transform;
+        transition: all 0.3s ease-in-out;
+        cursor: -webkit-grab;
+        cursor: -moz-grab;
+        cursor: grab;
+    }
+
+    .moving.tinder--card {
+        transition: none;
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+        cursor: grabbing;
+    }
+
+    .tinder--card video {
+        width: 100%;
+        height: 100%; /* Полное заполнение карточки */
+        object-fit: cover; /* Пропорциональное увеличение видео */
+        pointer-events: none;
+    }
+
+    .fa-heart {
+        color: #FFACE4;
+    }
+
+    .fa-remove {
+        color: #CDD6DD;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="tutorial-div" class="tutorial-div" onclick="stopAnimations()">
+    <lottie-player class="tutorial-anim-player" id="heart-animation" src="{% static 'main/animations/like.json' %}"
+                   background="transparent" speed="1.5"
+                   style="width: 300px; height: 300px; display: block; filter: brightness(0) invert(1);"></lottie-player>
+    <lottie-player class="tutorial-anim-player" id="right-animation"
+                   src="{% static 'main/animations/swipe-right.json' %}" background="transparent" speed="1.5"
+                   style="width: 400px; height: 400px; display: none; filter: brightness(0) invert(1);"></lottie-player>
+    <lottie-player class="tutorial-anim-player" id="dislike-animation" src="{% static 'main/animations/dislike.json' %}"
+                   background="transparent" speed="1.5"
+                   style="width: 300px; height: 300px; display: none; filter: brightness(0) invert(1);"></lottie-player>
+    <lottie-player class="tutorial-anim-player" id="left-animation" src="{% static 'main/animations/swipe-left.json' %}"
+                   background="transparent" speed="1.5"
+                   style="width: 400px; height: 400px; display: none; filter: brightness(0) invert(1);"></lottie-player>
+    <div id="message">Если понравилось, свайпните вправо</div>
+</div>
+
+<div class="tinder">
+    <div class="tinder--status">
+        <i class="fa fa-remove" style="font-size: 20em;"></i>
+        <i class="fa fa-heart" style="font-size: 20em;"></i>
+    </div>
+
+    <div class="tinder--cards">
+        {% for short in shorts %}
+        <div class="tinder--card" data-video-categories="{{ short.category }}">
+            <video src="{{ short.video_url }}" loop style="height: 100%;">
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    'use strict';
+
+    let tinderContainer = document.querySelector('.tinder');
+    let allCards = document.querySelectorAll('.tinder--card');
+
+    function sendReactionToServer(videoCategories, reaction) {
+        fetch('/send_shorts_reaction/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `video_id=${videoCategories}&reaction_type=${reaction}`
+        })
+        .then(response => response.json())
+        .then(data => console.log('Реакция отправлена:', data))
+        .catch((error) => console.error('Ошибка:', error));
+    }
+
+    function stopAnimations() {
+        document.getElementById('tutorial-div').style.display = 'none';
+        initCards();
+    }
+
+    function myDoubleClickFunction(event) {
+        const video = event.target.querySelector('video');
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    }
+
+    function initCards(card, index) {
+        let newCards = document.querySelectorAll('.tinder--card:not(.removed)');
+
+        newCards.forEach(function (card, index) {
+            card.style.zIndex = allCards.length - index;
+            card.style.transform = 'scale(' + (20 - index) / 20 + ') translateY(-' + 30 * index + 'px)';
+            card.style.opacity = (10 - index) / 10;
+
+            const video = card.querySelector('video');
+            if (video) {
+                video.currentTime = 0;
+                video.play();
+
+                // Добавляем обработчик события 'ended'
+                video.addEventListener('ended', function() {
+                    const videoCategories = card.dataset.videoCategories;
+                    sendReactionToServer(videoCategories, 'viewed');
+                });
+            }
+        });
+
+        tinderContainer.classList.add('loaded');
+    }
+
+    document.addEventListener('click', function () {
+        const videos = document.querySelectorAll('.tinder--card video');
+        videos.forEach(video => {
+            video.play();
+        });
+    });
+
+    allCards.forEach(function (el) {
+        let hammertime = new Hammer(el);
+
+        hammertime.on('pan', function (event) {
+            el.classList.add('moving');
+        });
+
+        hammertime.on('pan', function (event) {
+            if (event.deltaX === 0) return;
+            if (event.center.x === 0 && event.center.y === 0) return;
+
+            tinderContainer.classList.toggle('tinder_love', event.deltaX > 0);
+            tinderContainer.classList.toggle('tinder_nope', event.deltaX < 0);
+
+            let xMulti = event.deltaX * 0.03;
+            let yMulti = event.deltaY / 80;
+            let rotate = xMulti * yMulti;
+
+            event.target.style.transform = 'translate(' + event.deltaX + 'px, ' + event.deltaY + 'px) rotate(' + rotate + 'deg)';
+        });
+
+        hammertime.on('panend', function (event) {
+            el.classList.remove('moving');
+            tinderContainer.classList.remove('tinder_love');
+            tinderContainer.classList.remove('tinder_nope');
+
+            let moveOutWidth = document.body.clientWidth;
+            let keep = Math.abs(event.deltaX) < 80 || Math.abs(event.velocityX) < 0.5;
+
+            event.target.classList.toggle('removed', !keep);
+
+            const video = event.target.querySelector('video');
+            if (!keep && video) {
+                video.pause();
+            }
+
+            if (keep) {
+                event.target.style.transform = '';
+            } else {
+                let endX = Math.max(Math.abs(event.velocityX) * moveOutWidth, moveOutWidth);
+                let toX = event.deltaX > 0 ? endX : -endX;
+                let endY = Math.abs(event.velocityY) * moveOutWidth;
+                let toY = event.deltaY > 0 ? endY : -endY;
+                let xMulti = event.deltaX * 0.03;
+                let yMulti = event.deltaY / 80;
+                let rotate = xMulti * yMulti;
+
+                event.target.style.transform = 'translate(' + toX + 'px, ' + (toY + event.deltaY) + 'px) rotate(' + rotate + 'deg)';
+                
+                const videoCategories = event.target.dataset.videoCategories;
+                const reaction = event.deltaX > 0 ? 'like' : 'dislike';
+                sendReactionToServer(videoCategories, reaction);
+
+                setTimeout(() => {
+                    event.target.remove();
+                    initCards();
+                }, 300);
+            }
+        });
+    });
+
+    function createButtonListener(love) {
+        return function (event) {
+            let cards = document.querySelectorAll('.tinder--card:not(.removed)');
+            let moveOutWidth = document.body.clientWidth * 1.5;
+
+            if (!cards.length) return false;
+
+            let card = cards[0];
+
+            card.classList.add('removed');
+
+            if (love) {
+                card.style.transform = 'translate(' + moveOutWidth + 'px, -100px) rotate(-30deg)';
+                sendReactionToServer(card.dataset.videoCategories, 'like');
+            } else {
+                card.style.transform = 'translate(-' + moveOutWidth + 'px, -100px) rotate(30deg)';
+                sendReactionToServer(card.dataset.videoCategories, 'dislike');
+            }
+
+            setTimeout(() => {
+                card.remove();
+                initCards();
+            }, 300);
+
+            event.preventDefault();
+        };
+    }
+
+    let nopeListener = createButtonListener(false);
+    let loveListener = createButtonListener(true);
+
+    document.querySelectorAll('.tinder--card video').forEach(video => {
+        video.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.paused) {
+                this.play();
+            } else {
+                this.pause();
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const heartAnimation = document.getElementById('heart-animation');
+        const rightAnimation = document.getElementById('right-animation');
+        const dislikeAnimation = document.getElementById('dislike-animation');
+        const leftAnimation = document.getElementById('left-animation');
+        const message = document.getElementById('message');
+
+        function playAnimation(animation) {
+            animation.style.display = 'block';
+            animation.stop();
+            animation.play();
+        }
+
+        function startAnimations() {
+            heartAnimation.style.display = 'block';
+            playAnimation(heartAnimation);
+        }
+
+        heartAnimation.addEventListener('complete', function () {
+            heartAnimation.style.display = 'none';
+            message.innerText = 'Если понравилось, свайпните вправо';
+            playAnimation(rightAnimation);
+        });
+
+        rightAnimation.addEventListener('complete', function () {
+            rightAnimation.style.display = 'none';
+
+            setTimeout(function () {
+                playAnimation(dislikeAnimation);
+                message.innerText = 'Если не понравилось, свайпните влево';
+            }, 200);
+        });
+
+        dislikeAnimation.addEventListener('complete', function () {
+            dislikeAnimation.style.display = 'none';
+            playAnimation(leftAnimation);
+        });
+
+        leftAnimation.addEventListener('complete', function () {
+            leftAnimation.style.display = 'none';
+            message.innerText = '';
+            setTimeout(function () {
+                message.innerText = 'Если понравилось, свайпните вправо';
+                startAnimations();
+            }, 200);
+        });
+
+        startAnimations();
+    });
+</script>
+{% endblock %}

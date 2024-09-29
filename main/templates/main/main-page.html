@@ -3,18 +3,21 @@
 
 {% block styles %}
     <style>
+        /* Основные стили для главной страницы */
 
-
+        /* Стиль для основного контейнера */
         main {
             padding: 20px;
         }
 
+        /* Стиль для заголовков разделов */
         h2 {
             color: #f0f0f0;
             font-size: 20px;
             margin-bottom: 15px;
         }
 
+        /* Стиль для "полки" с видео */
         .shelf {
             display: flex;
             overflow-x: auto;
@@ -25,10 +28,12 @@
             -ms-overflow-style: none;
         }
 
+        /* Скрытие полосы прокрутки для webkit браузеров */
         .shelf::-webkit-scrollbar {
             display: none;
         }
 
+        /* Стиль для карточки видео */
         .video-card {
             flex: 0 0 auto;
             width: 300px;
@@ -44,34 +49,40 @@
             scroll-snap-align: start;
         }
 
+        /* Эффект при наведении на карточку */
         .video-card:hover {
             transform: translateY(-5px);
         }
 
+        /* Стиль для заголовка видео */
         .video-card h3 {
             margin: 0 0 10px 0;
             font-size: 18px;
             color: #333;
         }
 
+        /* Стиль для категории видео */
         .video-card .category {
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
         }
 
+        /* Стиль для описания видео */
         .video-card p {
             margin: 0 0 10px 0;
             font-size: 14px;
             color: #666;
         }
 
+        /* Стиль для даты публикации */
         .video-card .date {
             font-size: 12px;
             color: #999;
             margin-bottom: 10px;
         }
 
+        /* Стиль для ID видео */
         .video-card .hash-id {
             font-size: 12px;
             color: #333;
@@ -82,12 +93,14 @@
             margin-bottom: 10px;
         }
 
+        /* Стиль для контейнера кнопок реакций */
         .video-card .reaction-buttons {
             display: flex;
             justify-content: space-between;
             margin-top: auto;
         }
 
+        /* Общий стиль для кнопок реакций */
         .video-card .reaction-button {
             padding: 5px 10px;
             border: none;
@@ -96,22 +109,26 @@
             font-size: 14px;
         }
 
+        /* Стиль для кнопки "Нравится" */
         .video-card .like-button {
             background-color: #4CAF50;
             color: white;
         }
 
+        /* Стиль для кнопки "Не нравится" */
         .video-card .dislike-button {
             background-color: #f44336;
             color: white;
         }
 
+        /* Стиль для контейнера точек навигации */
         .shelf-dots {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
 
+        /* Стиль для отдельной точки навигации */
         .shelf-dot {
             width: 10px;
             height: 10px;
@@ -121,32 +138,33 @@
             transition: background-color 0.3s;
         }
 
+        /* Стиль для активной точки навигации */
         .shelf-dot.active {
             background-color: #00A1E7;
         }
-
 
     </style>
 {% endblock %}
 
 {% block content %}
     
+        <!-- Секция рекомендуемых видео -->
         <h2><i class="ri-bard-fill"></i> Рекомендуемые</h2>
         <div class="shelf" id="recommended-shelf">
             {% for video in recommended_videos %}
                 <div class="video-card">
                     <h3>{{ video.title }}</h3>
-                    <div class="category">Категория: {{ video.category }}</div>
+                    <div class="category">Категория: {{ video.category_id }}</div>
                     <p>{{ video.description }}</p>
                     <div class="date">Дата публикации: {{ video.date|default:"Не указана" }}</div>
-                    <div class="hash-id" onclick="copyToClipboard('{{ video.id|default:"Не указан" }}')">
-                        ID: {{ video.id|default:"Не указан" }}</div>
+                    <div class="hash-id" onclick="copyToClipboard('{{ video.video_id|default:"Не указан" }}')">
+                        ID: {{ video.video_id|default:"Не указан" }}</div>
                     <div class="reaction-buttons">
-                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.id }}')">
+                        <button class="reaction-button like-button" onclick="sendReaction('like', '{{ video.video_id }}')">
                             Нравится
                         </button>
                         <button class="reaction-button dislike-button"
-                                onclick="sendReaction('dislike', '{{ video.id }}')">Не нравится
+                                onclick="sendReaction('dislike', '{{ video.video_id }}')">Не нравится
                         </button>
                     </div>
                 </div>
@@ -154,6 +172,7 @@
         </div>
         <div class="shelf-dots" id="recommended-dots"></div>
 
+        <!-- Секция трендовых видео -->
         <h2><i class="ri-fire-fill"></i> В тренде</h2>
         <div class="shelf" id="trending-shelf">
             {% for video in trending_videos %}
@@ -177,6 +196,7 @@
         </div>
         <div class="shelf-dots" id="trending-dots"></div>
 
+        <!-- Секция новых видео -->
         <h2><i class="ri-question-mark"></i> Новые видео</h2>
         <div class="shelf" id="new-shelf">
             {% for video in new_videos %}
@@ -205,6 +225,7 @@
 
 {% block scripts %}
     <script>
+        // Функция для копирования ID видео в буфер обмена
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function () {
                 alert('ID скопирован: ' + text);
@@ -213,6 +234,7 @@
             });
         }
 
+        // Функция для отправки реакции на видео
         function sendReaction(reaction, videoId) {
             fetch('{% url "send_reaction" %}', {
                 method: 'POST',
@@ -234,12 +256,14 @@
 
         
 
+        // Функция для инициализации точек навигации для полки с видео
         function initDots(shelfId, dotsId) {
             const shelf = document.getElementById(shelfId);
             const dots = document.getElementById(dotsId);
             const cards = shelf.querySelectorAll('.video-card');
             const dotCount = cards.length;
 
+            // Создание точек навигации
             for (let i = 0; i < dotCount; i++) {
                 const dot = document.createElement('div');
                 dot.classList.add('shelf-dot');
@@ -247,17 +271,20 @@
                 dots.appendChild(dot);
             }
 
+            // Обработчик события прокрутки полки
             shelf.addEventListener('scroll', () => {
                 const scrollPosition = shelf.scrollLeft;
                 const cardWidth = cards[0].offsetWidth + parseInt(window.getComputedStyle(cards[0]).marginRight);
                 const currentIndex = Math.round(scrollPosition / cardWidth);
 
+                // Обновление активной точки
                 dots.querySelectorAll('.shelf-dot').forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentIndex);
                 });
             });
         }
 
+        // Инициализация точек навигации после загрузки DOM
         document.addEventListener('DOMContentLoaded', () => {
             initDots('recommended-shelf', 'recommended-dots');
             initDots('trending-shelf', 'trending-dots');

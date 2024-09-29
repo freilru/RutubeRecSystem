@@ -2,15 +2,19 @@
 {% load static %}
 
 {% block styles %}
+<!-- Подключение шрифтов Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
       rel="stylesheet">
 
+<!-- Подключение библиотеки Lottie для анимаций -->
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
+<!-- Подключение библиотеки Hammer.js для обработки жестов -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 
+<!-- Подключение Font Awesome для иконок -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
       integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
       crossorigin="anonymous" referrerpolicy="no-referrer"/>
@@ -27,12 +31,14 @@
         overflow: hidden; /* Скрыть переполнение */
     }
 
+    /* Стили для затемненного фона обучающего экрана */
     .tutorial-div {
         background-color: rgba(0, 0, 0, 0.3); /* Затемненный фон */
         width: 100vw;
         height: 100vh;
     }
 
+    /* Стили для позиционирования анимации в центре экрана */
     .tutorial-anim-player {
         position: absolute; /* Абсолютное позиционирование анимации */
         top: 50%; /* Центрирование по вертикали */
@@ -40,6 +46,7 @@
         transform: translate(-50%, -50%); /* Сдвиг для центрирования */
     }
 
+    /* Стили для текстового сообщения под анимацией */
     #message {
         position: absolute; /* Абсолютное позиционирование текста */
         top: 70%; /* Позиция текста под анимацией */
@@ -56,6 +63,7 @@
         margin: 0;
     }
 
+    /* Основной контейнер для Tinder-подобного интерфейса */
     .tinder {
         width: 100vw;
         height: 100vh;
@@ -69,10 +77,12 @@
         align-items: center; /* Центрирование по горизонтали */
     }
 
+    /* Стиль для загруженного состояния */
     .loaded.tinder {
         opacity: 1;
     }
 
+    /* Стили для отображения статуса (лайк/дизлайк) */
     .tinder--status {
         position: absolute;
         top: 50%;
@@ -84,6 +94,7 @@
         pointer-events: none;
     }
 
+    /* Стили для иконок статуса */
     .tinder--status i {
         font-size: 100px;
         opacity: 0;
@@ -94,16 +105,19 @@
         margin-left: -50px;
     }
 
+    /* Стили для отображения лайка */
     .tinder_love .fa-heart {
         opacity: 0.7;
         transform: scale(1);
     }
 
+    /* Стили для отображения дизлайка */
     .tinder_nope .fa-remove {
         opacity: 0.7;
         transform: scale(1);
     }
 
+    /* Стили для контейнера карточек */
     .tinder--cards {
         flex-grow: 1;
         padding-top: 0px;
@@ -116,6 +130,7 @@
         
     }
 
+    /* Стили для отдельной карточки */
     .tinder--card {
         display: inline-block;
         width: 96vw; /* Изменено для соотношения 9:16 */
@@ -131,6 +146,7 @@
         cursor: grab;
     }
 
+    /* Стили для движущейся карточки */
     .moving.tinder--card {
         transition: none;
         cursor: -webkit-grabbing;
@@ -138,6 +154,7 @@
         cursor: grabbing;
     }
 
+    /* Стили для видео внутри карточки */
     .tinder--card video {
         width: 100%;
         height: 100%; /* Полное заполнение карточки */
@@ -145,6 +162,7 @@
         pointer-events: none;
     }
 
+    /* Цвета для иконок лайка и дизлайка */
     .fa-heart {
         color: #FFACE4;
     }
@@ -156,6 +174,7 @@
 {% endblock %}
 
 {% block content %}
+<!-- Обучающий экран с анимациями -->
 <div id="tutorial-div" class="tutorial-div" onclick="stopAnimations()">
     <lottie-player class="tutorial-anim-player" id="heart-animation" src="{% static 'main/animations/like.json' %}"
                    background="transparent" speed="1.5"
@@ -172,6 +191,7 @@
     <div id="message">Если понравилось, свайпните вправо</div>
 </div>
 
+<!-- Основной контейнер для Tinder-подобного интерфейса -->
 <div class="tinder">
     <div class="tinder--status">
         <i class="fa fa-remove" style="font-size: 20em;"></i>
@@ -193,6 +213,7 @@
     let tinderContainer = document.querySelector('.tinder');
     let allCards = document.querySelectorAll('.tinder--card');
 
+    // Функция для отправки реакции на сервер
     function sendReactionToServer(videoCategories, reaction) {
         fetch('/send_shorts_reaction/', {
             method: 'POST',
@@ -207,11 +228,13 @@
         .catch((error) => console.error('Ошибка:', error));
     }
 
+    // Функция для остановки анимаций и инициализации карточек
     function stopAnimations() {
         document.getElementById('tutorial-div').style.display = 'none';
         initCards();
     }
 
+    // Функция для обработки двойного клика (воспроизведение/пауза видео)
     function myDoubleClickFunction(event) {
         const video = event.target.querySelector('video');
         if (video.paused) {
@@ -221,6 +244,7 @@
         }
     }
 
+    // Функция инициализации карточек
     function initCards(card, index) {
         let newCards = document.querySelectorAll('.tinder--card:not(.removed)');
 
@@ -245,6 +269,7 @@
         tinderContainer.classList.add('loaded');
     }
 
+    // Обработчик клика для воспроизведения видео
     document.addEventListener('click', function () {
         const videos = document.querySelectorAll('.tinder--card video');
         videos.forEach(video => {
@@ -252,6 +277,7 @@
         });
     });
 
+    // Обработка свайпов для каждой карточки
     allCards.forEach(function (el) {
         let hammertime = new Hammer(el);
 
@@ -313,6 +339,7 @@
         });
     });
 
+    // Функция для создания обработчика кнопок лайка/дизлайка
     function createButtonListener(love) {
         return function (event) {
             let cards = document.querySelectorAll('.tinder--card:not(.removed)');
@@ -344,6 +371,7 @@
     let nopeListener = createButtonListener(false);
     let loveListener = createButtonListener(true);
 
+    // Обработчик клика на видео для воспроизведения/паузы
     document.querySelectorAll('.tinder--card video').forEach(video => {
         video.addEventListener('click', function(e) {
             e.preventDefault();
@@ -355,6 +383,7 @@
         });
     });
 
+    // Инициализация и управление анимациями обучающего экрана
     document.addEventListener('DOMContentLoaded', function () {
         const heartAnimation = document.getElementById('heart-animation');
         const rightAnimation = document.getElementById('right-animation');
